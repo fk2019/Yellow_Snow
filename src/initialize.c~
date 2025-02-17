@@ -1,0 +1,6 @@
+#include "initialize.h"
+
+bool game_initialized(Game_T *g)
+{
+	
+}

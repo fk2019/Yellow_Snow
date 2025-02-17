@@ -1,0 +1,15 @@
+#include "main.h"
+#include "game.h"
+
+int main(void)
+{
+	Game_T *game = NULL;
+
+	if (game_new(&game))
+	{
+		game_free(&game);
+		return EXIT_FAILURE;
+	}
+	game_free(&game);
+	return EXIT_SUCCESS;
+}

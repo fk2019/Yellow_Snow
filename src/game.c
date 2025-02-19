@@ -31,7 +31,7 @@ void game_free(Game_T **game)
 		free(g);
 		g = NULL;
 		*game = NULL;
-		printf("All Clean\n");
+		printf("All Clean!\n");
 	}
 }
 

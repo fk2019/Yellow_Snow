@@ -18,6 +18,8 @@ bool player_new(Player_T **player, SDL_Renderer *renderer, SDL_Texture *image)
 		return true;
 	}
 	p->flip = SDL_FLIP_NONE;
+	p->rect.x = (WINDOW_WIDTH - p->rect.w) / 2;
+	p->rect.y = 377;
 	return false;
 }
 void player_free(Player_T **player)
@@ -29,6 +31,7 @@ void player_free(Player_T **player)
 		(*player)->keystate = NULL;
 		free(*player);
 		*player = NULL;
+		printf("cleaned player\n");
 	}
 }
 void player_update(Player_T *p)

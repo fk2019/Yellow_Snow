@@ -36,6 +36,14 @@ void player_free(Player_T **player)
 }
 void player_update(Player_T *p)
 {
+	if (p->keystate[SDL_SCANCODE_LEFT])
+	{
+		p->rect.x -= 5;
+	}
+	if (p->keystate[SDL_SCANCODE_RIGHT])
+	{
+		p->rect.x += 5;
+	}
 }
 void player_draw(Player_T *p)
 {

@@ -75,6 +75,7 @@ bool game_run(Game_T *g)
 				break;
 			}
 		}
+		player_update(g->player);
 		SDL_RenderClear(g->renderer);
 		SDL_RenderCopy(g->renderer, g->background_image, NULL, &g->background_rect); //display texture
 		player_draw(g->player);

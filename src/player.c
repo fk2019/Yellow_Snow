@@ -1,0 +1,41 @@
+#include "player.h"
+
+bool player_new(Player_T **player, SDL_Renderer *renderer, SDL_Texture *image)
+{
+	*player = calloc(1, sizeof(Player_T));
+	if (*player == NULL)
+	{
+		fprintf(stderr, "Error in calloc of new player: %s\n", SDL_GetError());
+		return true;
+	}
+	Player_T *p = *player;
+	p->renderer = renderer;
+	p->image = image;
+	p->keystate = SDL_GetKeyboardState(NULL); // current state of keyboard
+	if (SDL_QueryTexture(p->image, NULL, NULL, &p->rect.w, &p->rect.h))
+	{
+		fprintf(stderr, "Error in querying player texture: %s\n", SDL_GetError());
+		return true;
+	}
+	p->flip = SDL_FLIP_NONE;
+	return false;
+}
+void player_free(Player_T **player)
+{
+	if (*player)
+	{
+		(*player)->image = NULL;
+		(*player)->renderer = NULL;
+		(*player)->keystate = NULL;
+		free(*player);
+		*player = NULL;
+	}
+}
+void player_update(Player_T *p)
+{
+}
+void player_draw(Player_T *p)
+{
+	//rotate and flip texture
+	SDL_RenderCopyEx(p->renderer, p->image, NULL, &p->rect, 0, NULL, p->flip);
+}

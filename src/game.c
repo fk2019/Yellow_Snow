@@ -1,5 +1,7 @@
 #include "game.h"
 #include "initialize.h"
+#include "load_media.h"
+#include "player.h"
 
 bool game_new(Game_T **game)
 {
@@ -15,17 +17,31 @@ bool game_new(Game_T **game)
 	{
 		return true;
 	}
+	if (game_load_media(g))
+	{
+		return true;
+	}
+	if (player_new(&g->player, g->renderer, g->player_image))
+	{
+		return true;
+	}
 	return false;
 }
 
 void game_free(Game_T **game)
 {
-	Game_T *g = *game;
-	if (g)
+	if (*game)
 	{
+		Game_T *g = *game;
+		player_free(&g->player);
+		SDL_DestroyTexture(g->player_image);
+		g->player_image = NULL;
+		SDL_DestroyTexture(g->background_image);
+		g->background_image = NULL;
 		SDL_DestroyRenderer(g->renderer);
 		g->renderer = NULL;
 		SDL_DestroyWindow(g->window);
+		g->window = NULL;
 		SDL_Quit();
 
 		free(g);
@@ -60,6 +76,8 @@ bool game_run(Game_T *g)
 			}
 		}
 		SDL_RenderClear(g->renderer);
+		SDL_RenderCopy(g->renderer, g->background_image, NULL, &g->background_rect); //display texture
+		player_draw(g->player);
 		SDL_RenderPresent(g->renderer);
 		SDL_Delay(16);
 	}

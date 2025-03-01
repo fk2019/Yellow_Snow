@@ -12,7 +12,7 @@ typedef struct Flake
 	bool is_white;
 	int ground;
 } Flake_T;
-bool flake_new(Flake_T **flake, SDL_Renderer *renderer, SDL_Texture *image);
+bool flake_new(Flake_T **flake, SDL_Renderer *renderer, SDL_Texture *image, bool is_white);
 void flakes_free(Flake_T **flakes);
 void flakes_update(Flake_T *f);
 void flakes_draw(Flake_T *f);

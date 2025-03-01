@@ -1,6 +1,6 @@
 #include "flakes.h"
 
-bool flake_new(Flake_T **flake, SDL_Renderer *renderer, SDL_Texture *image)
+bool flake_new(Flake_T **flake, SDL_Renderer *renderer, SDL_Texture *image, bool is_white)
 {
 	Flake_T *new_flake = calloc(1, sizeof(Flake_T));
 	if (!new_flake)
@@ -12,6 +12,7 @@ bool flake_new(Flake_T **flake, SDL_Renderer *renderer, SDL_Texture *image)
 	new_flake->image = image;
 	new_flake->speed = 30;
 	new_flake->ground = 514;
+	new_flake->is_white = is_white;
 	if (SDL_QueryTexture(new_flake->image, NULL, NULL, &new_flake->rect.w, &new_flake->rect.h))
 	{
 		fprintf(stderr, "Error querying flake texture: %s\n", SDL_GetError());

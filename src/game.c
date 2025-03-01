@@ -3,6 +3,9 @@
 #include "load_media.h"
 #include "player.h"
 
+bool check_collision(Game_T *g);
+bool handle_collision(Game_T *g, Flake_T *f);
+
 bool game_new(Game_T **game)
 {
 	*game = calloc(1, sizeof(Game_T));
@@ -27,14 +30,14 @@ bool game_new(Game_T **game)
 	}
 	for (int i = 0; i < 5; i++)
 	{
-		if (flake_new(&g->flakes, g->renderer, g->yellow_image))
+		if (flake_new(&g->flakes, g->renderer, g->yellow_image, false))
 		{
 			return true;
 		}
 	}
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		if (flake_new(&g->flakes, g->renderer, g->white_image))
+		if (flake_new(&g->flakes, g->renderer, g->white_image, true))
 		{
 			return true;
 		}
@@ -71,6 +74,46 @@ void game_free(Game_T **game)
 	}
 }
 
+bool handle_collision(Game_T *g, Flake_T *f)
+{
+	(void)g;
+	if (f->is_white)
+	{
+		printf("white \n");
+		flake_reset(f, false);
+	} else {
+		printf("yellow \n");
+		flake_reset(f, false);
+	}
+	return false;
+}
+bool check_collision(Game_T *g)
+{
+	Flake_T *f = g->flakes;
+	int p_top  = player_top(g->player);
+	int p_left = player_left(g->player);
+	int p_right = player_right(g->player);
+
+	while (f)
+	{
+		if (flake_bottom(f) > p_top)
+		{
+			if (flake_right(f) > p_left)
+			{
+				if (flake_left(f) < p_right)
+				{
+					if (handle_collision(g, f))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		f = f->next;
+	}
+	return false;
+}
+
 bool game_run(Game_T *g)
 {
 	while (1)
@@ -101,6 +144,11 @@ bool game_run(Game_T *g)
 		}
 		player_update(g->player);
 		flakes_update(g->flakes);
+
+		if (check_collision(g))
+		{
+			return true;
+		}
 		SDL_RenderClear(g->renderer);
 		SDL_RenderCopy(g->renderer, g->background_image, NULL, &g->background_rect); //display texture
 		player_draw(g->player);

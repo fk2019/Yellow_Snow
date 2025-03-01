@@ -25,9 +25,19 @@ bool game_new(Game_T **game)
 	{
 		return true;
 	}
-	if (flake_new(&g->flakes, g->renderer, g->yellow_image))
+	for (int i = 0; i < 5; i++)
 	{
-		return true;
+		if (flake_new(&g->flakes, g->renderer, g->yellow_image))
+		{
+			return true;
+		}
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		if (flake_new(&g->flakes, g->renderer, g->white_image))
+		{
+			return true;
+		}
 	}
 	return false;
 }

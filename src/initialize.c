@@ -30,5 +30,6 @@ bool game_initialize(struct Game *g) {
         fprintf(stderr, "Error loading icon_surf: %s\n", IMG_GetError());
         return true;
     }
+    srand((unsigned)time(NULL)); // seed random number generator
     return false;
 }

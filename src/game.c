@@ -88,6 +88,9 @@ bool game_run(Game_T *g)
 				case SDL_SCANCODE_ESCAPE:
 					return false;
 					break;
+				case SDL_SCANCODE_SPACE:
+					flakes_reset(g->flakes);
+					break;
 				default:
 					break;
 				}

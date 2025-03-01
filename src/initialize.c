@@ -5,6 +5,19 @@ bool game_initialize(struct Game *g) {
         fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
         return true;
     }
+    int img_init = IMG_Init(IMAGE_FLAGS);
+    if ((img_init & IMAGE_FLAGS) != IMAGE_FLAGS)
+    {
+	    fprintf(stderr, "Error initializing SDL image: %s\n", IMG_GetError());
+	    return true;
+    }
+
+    int mix_init = Mix_Init(MIXER_FLAGS);
+    if ((mix_init & MIXER_FLAGS) != MIXER_FLAGS)
+    {
+	    fprintf(stderr, "Error initializing SDL mixer: %s\n", Mix_GetError());
+	    return true;
+    }
 
     g->window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
                                  SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH,

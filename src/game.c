@@ -65,6 +65,8 @@ void game_free(Game_T **game)
 		g->renderer = NULL;
 		SDL_DestroyWindow(g->window);
 		g->window = NULL;
+		Mix_Quit();
+		IMG_Quit();
 		SDL_Quit();
 
 		free(g);

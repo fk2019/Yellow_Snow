@@ -90,6 +90,7 @@ bool game_run(Game_T *g)
 					break;
 				case SDL_SCANCODE_SPACE:
 					flakes_reset(g->flakes);
+					player_reset(g->player);
 					break;
 				default:
 					break;

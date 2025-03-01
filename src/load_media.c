@@ -23,6 +23,20 @@ bool game_load_media(Game_T *g)
 		fprintf(stderr, "Error loading player texture: %s\n", IMG_GetError());
 		return true;
 	}
+	//load yellow flake
+	g->yellow_image =  IMG_LoadTexture(g->renderer, "images/yellow.png");
+	if (!g->yellow_image)
+	{
+		fprintf(stderr, "Error loading yellow flake texture: %s\n", IMG_GetError());
+		return true;
+	}
+	// load white flake
+	g->white_image =  IMG_LoadTexture(g->renderer, "images/white.png");
+	if (!g->white_image)
+	{
+		fprintf(stderr, "Error loading white flake texture: %s\n", IMG_GetError());
+		return true;
+	}
 
 	return false;
 }

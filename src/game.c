@@ -25,6 +25,10 @@ bool game_new(Game_T **game)
 	{
 		return true;
 	}
+	if (flake_new(&g->flakes, g->renderer, g->yellow_image))
+	{
+		return true;
+	}
 	return false;
 }
 
@@ -33,7 +37,13 @@ void game_free(Game_T **game)
 	if (*game)
 	{
 		Game_T *g = *game;
+		flakes_free(&g->flakes);
 		player_free(&g->player);
+
+		SDL_DestroyTexture(g->yellow_image);
+		g->yellow_image = NULL;
+		SDL_DestroyTexture(g->white_image);
+		g->white_image = NULL;
 		SDL_DestroyTexture(g->player_image);
 		g->player_image = NULL;
 		SDL_DestroyTexture(g->background_image);
@@ -76,9 +86,11 @@ bool game_run(Game_T *g)
 			}
 		}
 		player_update(g->player);
+		flakes_update(g->flakes);
 		SDL_RenderClear(g->renderer);
 		SDL_RenderCopy(g->renderer, g->background_image, NULL, &g->background_rect); //display texture
 		player_draw(g->player);
+		flakes_draw(g->flakes);
 		SDL_RenderPresent(g->renderer);
 		SDL_Delay(16);
 	}

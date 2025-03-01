@@ -39,11 +39,13 @@ void player_update(Player_T *p)
 	if (p->keystate[SDL_SCANCODE_LEFT] || p->keystate[SDL_SCANCODE_A])
 	{
 		p->rect.x -= 5;
+		if (p->rect.x < 0) p->rect.x = 0;
 		p->flip = SDL_FLIP_HORIZONTAL;
 	}
 	if (p->keystate[SDL_SCANCODE_RIGHT] || p->keystate[SDL_SCANCODE_D])
 	{
 		p->rect.x += 5;
+		if (p->rect.x + p->rect.w > WINDOW_WIDTH) p->rect.x = WINDOW_WIDTH - p->rect.w;
 		p->flip = SDL_FLIP_NONE;
 	}
 }

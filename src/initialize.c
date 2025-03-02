@@ -18,6 +18,17 @@ bool game_initialize(struct Game *g) {
 	    fprintf(stderr, "Error initializing SDL mixer: %s\n", Mix_GetError());
 	    return true;
     }
+    //load ttf
+    if (TTF_Init())
+    {
+	    fprintf(stderr, "Error initializing TTF: %s\n", TTF_GetError());
+	    return true;
+    }
+    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024))
+    {
+	    fprintf(stderr, "Error opening audio: %s\n", Mix_GetError());
+	    return true;
+    }
 
     g->window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
                                  SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH,

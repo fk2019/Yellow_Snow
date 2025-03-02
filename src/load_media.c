@@ -37,6 +37,19 @@ bool game_load_media(Game_T *g)
 		fprintf(stderr, "Error loading white flake texture: %s\n", IMG_GetError());
 		return true;
 	}
+	//load audio
+	g->hit_sound = Mix_LoadWAV("sounds/hit.ogg");
+	if (!g->hit_sound)
+	{
+		fprintf(stderr, "Error loading hit sound Chunk: %s\n", Mix_GetError());
+		return true;
+	}
+	g->collect_sound = Mix_LoadWAV("sounds/collect.ogg");
+	if (!g->collect_sound)
+	{
+		fprintf(stderr, "Error loading collect sound Chunk: %s\n", Mix_GetError());
+		return true;
+	}
 
 	return false;
 }

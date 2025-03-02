@@ -2,9 +2,11 @@
 #include "initialize.h"
 #include "load_media.h"
 #include "player.h"
+#include "score.h"
 
 bool check_collision(Game_T *g);
 bool handle_collision(Game_T *g, Flake_T *f);
+bool game_reset(Game_T *g);
 
 bool game_new(Game_T **game)
 {
@@ -42,6 +44,9 @@ bool game_new(Game_T **game)
 			return true;
 		}
 	}
+
+	if (score_new(&g->score, g->renderer)) return true;
+	g->playing = true;
 	return false;
 }
 
@@ -50,9 +55,15 @@ void game_free(Game_T **game)
 	if (*game)
 	{
 		Game_T *g = *game;
+		score_free(&g->score);
 		flakes_free(&g->flakes);
 		player_free(&g->player);
 
+
+		Mix_FreeChunk(g->collect_sound);
+		g->collect_sound = NULL;
+		Mix_FreeChunk(g->hit_sound);
+		g->hit_sound = NULL;
 		SDL_DestroyTexture(g->yellow_image);
 		g->yellow_image = NULL;
 		SDL_DestroyTexture(g->white_image);
@@ -61,10 +72,15 @@ void game_free(Game_T **game)
 		g->player_image = NULL;
 		SDL_DestroyTexture(g->background_image);
 		g->background_image = NULL;
+
 		SDL_DestroyRenderer(g->renderer);
 		g->renderer = NULL;
 		SDL_DestroyWindow(g->window);
 		g->window = NULL;
+
+		Mix_CloseAudio();
+
+		TTF_Quit();
 		Mix_Quit();
 		IMG_Quit();
 		SDL_Quit();
@@ -76,16 +92,27 @@ void game_free(Game_T **game)
 	}
 }
 
+bool game_reset(Game_T *g)
+{
+	//call player and flake reset functions
+	flakes_reset(g->flakes);
+	player_reset(g->player);
+	g->playing = true;
+	if (score_reset(g->score)) return true;
+	return false;
+}
+
 bool handle_collision(Game_T *g, Flake_T *f)
 {
 	(void)g;
 	if (f->is_white)
 	{
-		printf("white \n");
+		Mix_PlayChannel(-1, g->collect_sound, 0);
 		flake_reset(f, false);
+		score_increment(g->score);
 	} else {
-		printf("yellow \n");
-		flake_reset(f, false);
+		Mix_PlayChannel(-1, g->hit_sound, 0);
+		g->playing = false;
 	}
 	return false;
 }
@@ -134,8 +161,13 @@ bool game_run(Game_T *g)
 					return false;
 					break;
 				case SDL_SCANCODE_SPACE:
-					flakes_reset(g->flakes);
-					player_reset(g->player);
+					if (!g->playing)
+					{
+						if (game_reset(g))
+						{
+							return true;
+						}
+					}
 					break;
 				default:
 					break;
@@ -144,17 +176,21 @@ bool game_run(Game_T *g)
 				break;
 			}
 		}
-		player_update(g->player);
-		flakes_update(g->flakes);
-
-		if (check_collision(g))
+		if (g->playing)
 		{
-			return true;
+			player_update(g->player);
+			flakes_update(g->flakes);
+			score_update(g->score);
+			if (check_collision(g))
+			{
+				return true;
+			}
 		}
 		SDL_RenderClear(g->renderer);
 		SDL_RenderCopy(g->renderer, g->background_image, NULL, &g->background_rect); //display texture
 		player_draw(g->player);
 		flakes_draw(g->flakes);
+		score_draw(g->score);
 		SDL_RenderPresent(g->renderer);
 		SDL_Delay(16);
 	}

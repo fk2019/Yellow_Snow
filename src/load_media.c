@@ -50,6 +50,13 @@ bool game_load_media(Game_T *g)
 		fprintf(stderr, "Error loading collect sound Chunk: %s\n", Mix_GetError());
 		return true;
 	}
+	//load music
+	g->music = Mix_LoadMUS("music/winter_loop.ogg");
+	if (!g->music)
+	{
+		fprintf(stderr, "Error loading music: %s\n", Mix_GetError());
+		return true;
+	}
 
 	return false;
 }

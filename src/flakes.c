@@ -10,7 +10,7 @@ bool flake_new(Flake_T **flake, SDL_Renderer *renderer, SDL_Texture *image, bool
 	}
 	new_flake->renderer = renderer;
 	new_flake->image = image;
-	new_flake->speed = 30;
+	new_flake->speed = 300;
 	new_flake->ground = 514;
 	new_flake->is_white = is_white;
 	if (SDL_QueryTexture(new_flake->image, NULL, NULL, &new_flake->rect.w, &new_flake->rect.h))
@@ -36,7 +36,6 @@ void flakes_free(Flake_T **flakes)
 		f->next = NULL;
 		free(f);
 		f = next;
-		printf("Clean flake\n");
 	}
 	*flakes = NULL;
 }
@@ -47,6 +46,7 @@ void flake_reset(Flake_T *f, bool full)
 	//full reset or partial reset
 	int height = full ? WINDOW_HEIGHT * 2 : WINDOW_HEIGHT;
 	f->rect.y = -((rand() % height) + f->rect.h);
+	f->pos_y = (double)f->rect.y;
 	f->rect.x = rand() % (WINDOW_WIDTH - f->rect.w);
 }
 void flakes_reset(Flake_T *f)
@@ -69,15 +69,13 @@ int flake_bottom(Flake_T *f)
 {
 	return f->rect.y + f->rect.h;
 }
-void flakes_update(Flake_T *f)
+void flakes_update(Flake_T *f, double dt)
 {
 	while (f)
 	{
-		f->rect.y += f->speed;
-		if (f->rect.y > f->ground)
-		{
-			flake_reset(f, false);
-		}
+		f->pos_y += f->speed * dt;
+		if (f->pos_y > f->ground) flake_reset(f, false);
+		else f->rect.y = (int)f->pos_y;
 		f = f->next;
 	}
 }

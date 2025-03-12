@@ -12,7 +12,7 @@ bool player_new(Player_T **player, SDL_Renderer *renderer, SDL_Texture *image)
 	p->renderer = renderer;
 	p->image = image;
 	p->keystate = SDL_GetKeyboardState(NULL); // current state of keyboard
-	p->speed = 60;
+	p->speed = 300;
 	p->top_offset = 10;
 	p->left_offset = 47;
 	p->right_offset = 43;
@@ -34,13 +34,13 @@ void player_free(Player_T **player)
 		(*player)->keystate = NULL;
 		free(*player);
 		*player = NULL;
-		printf("cleaned player\n");
 	}
 }
 void player_reset(Player_T *p)
 {
 	p->rect.x = (WINDOW_WIDTH - p->rect.w) / 2;
 	p->rect.y = 377;
+	p->pos_x = (double)p->rect.x;
 
 }
 int player_top(Player_T *p)
@@ -58,20 +58,21 @@ int player_right(Player_T *p)
 	return p->rect.x + p->rect.w - p->right_offset;
 }
 
-void player_update(Player_T *p)
+void player_update(Player_T *p, double dt)
 {
 	if (p->keystate[SDL_SCANCODE_LEFT] || p->keystate[SDL_SCANCODE_A])
 	{
-		p->rect.x -= p->speed;
-		if (p->rect.x + p->left_offset < 0) p->rect.x = -p->left_offset;
+		p->pos_x -= p->speed * dt;
+		if (p->pos_x + p->left_offset < 0) p->pos_x = -p->left_offset;
 		p->flip = SDL_FLIP_HORIZONTAL;
 	}
 	if (p->keystate[SDL_SCANCODE_RIGHT] || p->keystate[SDL_SCANCODE_D])
 	{
-		p->rect.x += p->speed;
-		if (p->rect.x + p->rect.w - p->right_offset > WINDOW_WIDTH) p->rect.x = WINDOW_WIDTH - p->rect.w + p->right_offset;
+		p->pos_x += p->speed * dt;
+		if (p->pos_x + p->rect.w - p->right_offset > WINDOW_WIDTH) p->pos_x = WINDOW_WIDTH - p->rect.w + p->right_offset;
 		p->flip = SDL_FLIP_NONE;
 	}
+	p->rect.x = (int)p->pos_x;
 }
 void player_draw(Player_T *p)
 {

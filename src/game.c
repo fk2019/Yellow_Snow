@@ -7,6 +7,7 @@
 bool check_collision(Game_T *g);
 bool handle_collision(Game_T *g, Flake_T *f);
 bool game_reset(Game_T *g);
+void pause_music(Game_T *g);
 
 bool game_new(Game_T **game)
 {
@@ -46,6 +47,8 @@ bool game_new(Game_T **game)
 	}
 
 	if (score_new(&g->score, g->renderer)) return true;
+	if (fps_new(&g->fps)) return true;
+	if (title_new(&g->title, g->renderer)) return true;
 	g->playing = true;
 	return false;
 }
@@ -55,11 +58,14 @@ void game_free(Game_T **game)
 	if (*game)
 	{
 		Game_T *g = *game;
+		fps_free(&g->fps);
 		score_free(&g->score);
 		flakes_free(&g->flakes);
 		player_free(&g->player);
 
-
+		Mix_HaltMusic();
+		Mix_FreeMusic(g->music);
+		g->music = NULL;
 		Mix_FreeChunk(g->collect_sound);
 		g->collect_sound = NULL;
 		Mix_FreeChunk(g->hit_sound);
@@ -99,18 +105,20 @@ bool game_reset(Game_T *g)
 	player_reset(g->player);
 	g->playing = true;
 	if (score_reset(g->score)) return true;
+	if (!g->pause_music) Mix_ResumeMusic();
+
 	return false;
 }
 
 bool handle_collision(Game_T *g, Flake_T *f)
 {
-	(void)g;
 	if (f->is_white)
 	{
 		Mix_PlayChannel(-1, g->collect_sound, 0);
 		flake_reset(f, false);
 		score_increment(g->score);
 	} else {
+		Mix_PauseMusic();
 		Mix_PlayChannel(-1, g->hit_sound, 0);
 		g->playing = false;
 	}
@@ -143,8 +151,27 @@ bool check_collision(Game_T *g)
 	return false;
 }
 
+void pause_music(Game_T *g)
+{
+	if (g->pause_music)
+	{
+		g->pause_music = false;
+		if (g->playing) Mix_ResumeMusic();
+	}
+	else
+	{
+		g->pause_music = true;
+		Mix_PauseMusic();
+	}
+}
+
 bool game_run(Game_T *g)
 {
+	if (Mix_PlayMusic(g->music, -1))
+	{
+		fprintf(stderr, "Error playing music: %s\n", Mix_GetError());
+		return true;
+	}
 	while (1)
 	{
 		while (SDL_PollEvent(&g->event))
@@ -169,6 +196,12 @@ bool game_run(Game_T *g)
 						}
 					}
 					break;
+				case SDL_SCANCODE_F:
+					fps_toggle_display(g->fps);
+					break;
+				case SDL_SCANCODE_P:
+					pause_music(g);
+					break;
 				default:
 					break;
 				}
@@ -176,23 +209,28 @@ bool game_run(Game_T *g)
 				break;
 			}
 		}
+		if (g->playing || g->title->show_title) flakes_update(g->flakes, g->delta_time);
 		if (g->playing)
 		{
-			player_update(g->player);
-			flakes_update(g->flakes);
+			player_update(g->player, g->delta_time);
+
 			score_update(g->score);
 			if (check_collision(g))
 			{
 				return true;
 			}
+		} else
+		{
+			title_update(g->title, g->delta_time);
 		}
 		SDL_RenderClear(g->renderer);
 		SDL_RenderCopy(g->renderer, g->background_image, NULL, &g->background_rect); //display texture
 		player_draw(g->player);
 		flakes_draw(g->flakes);
 		score_draw(g->score);
+		title_draw(g->title);
 		SDL_RenderPresent(g->renderer);
-		SDL_Delay(16);
+		g->delta_time = fps_update(g->fps);
 	}
 	return false;
 }

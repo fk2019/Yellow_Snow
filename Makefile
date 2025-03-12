@@ -6,7 +6,7 @@ CFLAGS_BASE = -std=c99 $(shell pkg-config --cflags sdl2 SDL2_image SDL2_ttf SDL2
 CFLAGS_RELEASE = -O2
 LDFLAGS ?=
 FSANITIZE = -fsanitize=address -fsanitize-address-use-after-scope
-LDLIBS_BASE = $(shell pkg-config --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer)
+LDLIBS_BASE = $(shell pkg-config --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -lm
 SRCS = $(wildcard $(SOURCE_DIR)/*.c)
 OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRCS:.c=.o)))
 

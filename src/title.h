@@ -1,12 +1,16 @@
 #ifndef TITLE_H
 #define TITLE_H
-#include "main.h"
 
+#include "main.h"
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 typedef struct Title
 {
 	SDL_Renderer *renderer;
 	SDL_Texture *image;
-	SDL_Surface *text_surf;   //hold onto the surface
+	SDL_Surface *text_surf;
+	SDL_Surface *target_surf;
 	TTF_Font *font;
 	SDL_Rect rect;
 	double pos_y;

@@ -1,12 +1,17 @@
 #ifndef MAIN_H
+#define MAIN_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
+
 #define SDL_FLAGS SDL_INIT_EVERYTHING
 #define MIXER_FLAGS MIX_INIT_OGG
 #define IMAGE_FLAGS IMG_INIT_PNG
@@ -18,5 +23,5 @@
 #define TARGET_FPS 60
 #define GAME_RESET_EVENT SDL_USEREVENT
 #define GAME_RESET_TIME 5000
-#define MAIN_H
+
 #endif

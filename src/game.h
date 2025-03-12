@@ -23,6 +23,7 @@ typedef struct Game
 	bool playing;
 	bool pause_music;
 	double delta_time;
+	SDL_TimerID reset_timer_id;
 	Player_T *player;
 	Flake_T *flakes;
 	Score_T *score;

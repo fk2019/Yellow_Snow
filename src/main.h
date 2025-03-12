@@ -17,5 +17,6 @@
 #define FONT_SIZE 23
 #define TARGET_FPS 60
 #define GAME_RESET_EVENT SDL_USEREVENT
+#define GAME_RESET_TIME 5000
 #define MAIN_H
 #endif

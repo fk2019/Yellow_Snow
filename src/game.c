@@ -8,6 +8,7 @@ bool check_collision(Game_T *g);
 bool handle_collision(Game_T *g, Flake_T *f);
 bool game_reset(Game_T *g);
 void pause_music(Game_T *g);
+Uint32 game_reset_timer(Uint32 interval, void *param);
 
 bool game_new(Game_T **game)
 {
@@ -63,7 +64,7 @@ void game_free(Game_T **game)
 		flakes_free(&g->flakes);
 		player_free(&g->player);
 		title_free(&g->title);
-		
+
 		Mix_HaltMusic();
 		Mix_FreeMusic(g->music);
 		g->music = NULL;
@@ -107,10 +108,28 @@ bool game_reset(Game_T *g)
 	g->playing = true;
 	if (score_reset(g->score)) return true;
 	if (!g->pause_music) Mix_ResumeMusic();
+	if (g->reset_timer_id)
+	{
+		SDL_RemoveTimer(g->reset_timer_id);
+		g->reset_timer_id = 0;
+	}
 	title_disable(g->title);
 	return false;
 }
 
+Uint32 game_reset_timer(Uint32 interval, void *param)
+{
+	(void)interval;
+	(void)param;
+	SDL_Event event;
+
+	event.type = GAME_RESET_EVENT;
+	event.user.code = 0;
+	event.user.data1 = NULL;
+	event.user.data2 = NULL;
+	SDL_PushEvent(&event);
+	return 0;
+}
 bool handle_collision(Game_T *g, Flake_T *f)
 {
 	if (f->is_white)
@@ -122,6 +141,7 @@ bool handle_collision(Game_T *g, Flake_T *f)
 		Mix_PauseMusic();
 		Mix_PlayChannel(-1, g->hit_sound, 0);
 		g->playing = false;
+		g->reset_timer_id = SDL_AddTimer(GAME_RESET_TIME, game_reset_timer, NULL);
 	}
 	return false;
 }
@@ -157,7 +177,7 @@ void pause_music(Game_T *g)
 	if (g->pause_music)
 	{
 		g->pause_music = false;
-		if (g->playing) Mix_ResumeMusic();
+		if (g->playing || g->title->show_title) Mix_ResumeMusic();
 	}
 	else
 	{
@@ -181,6 +201,10 @@ bool game_run(Game_T *g)
 			{
 			case SDL_QUIT:
 				return false;
+				break;
+			case GAME_RESET_EVENT:
+				title_reset(g->title);
+				if (!g->pause_music) Mix_ResumeMusic();
 				break;
 			case SDL_KEYDOWN:
 				switch (g->event.key.keysym.scancode)

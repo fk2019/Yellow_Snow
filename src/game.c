@@ -62,7 +62,8 @@ void game_free(Game_T **game)
 		score_free(&g->score);
 		flakes_free(&g->flakes);
 		player_free(&g->player);
-
+		title_free(&g->title);
+		
 		Mix_HaltMusic();
 		Mix_FreeMusic(g->music);
 		g->music = NULL;
@@ -106,7 +107,7 @@ bool game_reset(Game_T *g)
 	g->playing = true;
 	if (score_reset(g->score)) return true;
 	if (!g->pause_music) Mix_ResumeMusic();
-
+	title_disable(g->title);
 	return false;
 }
 

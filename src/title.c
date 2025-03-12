@@ -10,6 +10,7 @@ bool title_new(Title_T **title, SDL_Renderer *renderer)
 	}
 	Title_T *t = *title;
 	t->renderer = renderer;
+	t->speed = 60;
 	SDL_Color outer_color = {255, 255, 0, 255};
 	const char *text = "Yellow Snow";
 	int text_size = 100;
@@ -72,7 +73,7 @@ void title_update(Title_T *t, double dt)
 		t->pos_y += t->speed * dt;
 		if (t->pos_y < t->target_y)
 		{
-			t->rect.y = t->pos_y;
+			t->rect.y = (int)t->pos_y;
 		} else
 		{
 			t->show_intro = false;
